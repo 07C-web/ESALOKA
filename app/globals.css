@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --gold-main: #C8A951;
-  --gold-dark: #A8893A;
-  --sage-main: #9FB48C;
-  --sage-dark: #7A9069;
-  --cream: #FAFAF7;
-  --dark: #1C1C1A;
+  --gold-main: #c8a951;
+  --gold-dark: #a8893a;
+  --sage-main: #9fb48c;
+  --sage-dark: #7a9069;
+  --cream: #fafaf7;
+  --dark: #1c1c1a;
 }
 
 html {
@@ -92,7 +92,7 @@ body {
     @apply input cursor-pointer appearance-none;
   }
   .textarea {
-    @apply input resize-vertical min-h-[96px];
+    @apply input resize-y min-h-[96px];
   }
   .label {
     @apply block text-xs font-medium text-stone-500 mb-1.5;
@@ -150,12 +150,28 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Custom scrollbar */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
+}
