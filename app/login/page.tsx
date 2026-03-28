@@ -1,47 +1,51 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { useState } from "react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
-  const [email, setEmail]       = useState('')
-  const [password, setPassword] = useState('')
-  const [showPass, setShowPass] = useState(false)
-  const [loading, setLoading]   = useState(false)
-  const [error, setError]       = useState<string | null>(null)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const router  = useRouter()
-  const supabase = createClient()
+  const supabase = createClient();
 
   async function handleLogin(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
-    })
+    });
 
     if (authError || !data.user) {
-      setError('Email atau password salah. Silakan coba lagi.')
-      setLoading(false)
-      return
+      setError("Email atau password salah. Silakan coba lagi.");
+      setLoading(false);
+      return;
     }
 
-    // Get role to redirect correctly
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('role')
-      .eq('id', data.user.id)
-      .single()
+    // Fetch role untuk redirect yang benar
+    const { data: profile, error: profileError } = await supabase
+      .from("user_profiles")
+      .select("role")
+      .eq("id", data.user.id)
+      .single();
 
-    const role = profile?.role || 'mitra'
-    router.push(`/dashboard/${role}`)
-    router.refresh()
+    if (profileError || !profile) {
+      setError("Profil pengguna tidak ditemukan. Hubungi admin.");
+      setLoading(false);
+      return;
+    }
+
+    // FIX: pakai window.location.href (full reload) bukan router.push
+    // Ini menghindari "Failed to fetch" RSC payload di Next.js 15
+    window.location.href = `/dashboard/${profile.role}`;
   }
 
   return (
@@ -49,11 +53,16 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2.5 justify-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2.5 justify-center"
+          >
             <div className="w-10 h-10 rounded-xl bg-gold-400 flex items-center justify-center">
               <span className="text-white font-bold text-base">E</span>
             </div>
-            <span className="font-semibold text-xl text-stone-800 tracking-tight">ESALOKA</span>
+            <span className="font-semibold text-xl text-stone-800 tracking-tight">
+              ESALOKA
+            </span>
           </Link>
           <p className="text-stone-400 text-sm mt-3">Masuk ke dashboard Anda</p>
         </div>
@@ -61,7 +70,6 @@ export default function LoginPage() {
         {/* Card */}
         <div className="card">
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
-            {/* Email */}
             <div>
               <label className="label">Email</label>
               <input
@@ -69,22 +77,21 @@ export default function LoginPage() {
                 className="input"
                 placeholder="nama@email.com"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
               />
             </div>
 
-            {/* Password */}
             <div>
               <label className="label">Password</label>
               <div className="relative">
                 <input
-                  type={showPass ? 'text' : 'password'}
+                  type={showPass ? "text" : "password"}
                   className="input pr-10"
                   placeholder="Masukkan password"
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
                 />
@@ -98,38 +105,41 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Error */}
             {error && (
               <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3">
                 <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
               className="btn-primary w-full flex items-center justify-center gap-2 mt-1"
             >
               {loading && <Loader2 size={16} className="animate-spin" />}
-              {loading ? 'Memproses...' : 'Masuk'}
+              {loading ? "Memproses..." : "Masuk"}
             </button>
           </form>
         </div>
 
-        {/* Footer */}
         <p className="text-center text-sm text-stone-400 mt-6">
-          Belum punya akun?{' '}
-          <Link href="/get-in-touch#daftar" className="text-gold-600 hover:text-gold-700 font-medium">
+          Belum punya akun?{" "}
+          <Link
+            href="/get-in-touch"
+            className="text-gold-600 hover:text-gold-700 font-medium"
+          >
             Daftar sebagai mitra
           </Link>
         </p>
         <p className="text-center mt-4">
-          <Link href="/" className="text-xs text-stone-400 hover:text-stone-600">
+          <Link
+            href="/"
+            className="text-xs text-stone-400 hover:text-stone-600"
+          >
             ← Kembali ke beranda
           </Link>
         </p>
       </div>
     </div>
-  )
+  );
 }
