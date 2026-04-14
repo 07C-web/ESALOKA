@@ -1,10 +1,18 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+// tipe custom biar aman
 type CookieToSet = {
   name: string;
   value: string;
-  options?: CookieOptions;
+  options?: {
+    path?: string;
+    domain?: string;
+    maxAge?: number;
+    secure?: boolean;
+    httpOnly?: boolean;
+    sameSite?: "lax" | "strict" | "none";
+  };
 };
 
 export async function createClient() {
@@ -23,7 +31,9 @@ export async function createClient() {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options),
             );
-          } catch {}
+          } catch {
+            // Server Component —ignore
+          }
         },
       },
     },
